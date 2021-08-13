@@ -261,9 +261,9 @@ public class LogIn extends JFrame{
 					userText.setVisible(false);
 					
 					JLabel password = new JLabel("new password: ");
-					password.setBounds(50, 40, 90, 20);
+					password.setBounds(35, 40, 120, 20);
 					JLabel confirmPassword = new JLabel("confirm password: ");
-					confirmPassword.setBounds(50, 75, 90, 20);
+					confirmPassword.setBounds(35, 75, 120, 20);
 					JPasswordField passwordText = new JPasswordField();
 					passwordText.setBounds(140, 40, 200, 22);
 					JPasswordField confirm = new JPasswordField();
