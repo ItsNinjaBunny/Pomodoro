@@ -24,6 +24,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 public class LogIn extends JFrame{
 	
@@ -38,7 +40,7 @@ public class LogIn extends JFrame{
 		loginPane();
 		
 		
-		this.add(mainPanel);
+		this.setContentPane(mainPanel);
 		this.setTitle("Pomodoro.exe");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setBounds(100, 100, 400, 200);
@@ -250,6 +252,10 @@ public class LogIn extends JFrame{
 		JButton reset = new JButton("reset");
 		reset.setBounds(227, 145, 50, 20);
 		passwordReset.add(reset);
+		getRootPane().setDefaultButton(reset);
+		JButton update = new JButton("update");
+		update.setBounds(227, 145, 50, 20);
+		
 		reset.addActionListener(new ActionListener() {
 			
 			@Override
@@ -261,13 +267,16 @@ public class LogIn extends JFrame{
 					userText.setVisible(false);
 					
 					JLabel password = new JLabel("new password: ");
-					password.setBounds(35, 40, 120, 20);
-					JLabel confirmPassword = new JLabel("confirm password: ");
-					confirmPassword.setBounds(35, 75, 120, 20);
+					password.setBounds(20, 40, 150, 20);
+					JLabel confirmPassword = new JLabel("confirm: ");
+					confirmPassword.setBounds(50, 75, 150, 20);
 					JPasswordField passwordText = new JPasswordField();
-					passwordText.setBounds(140, 40, 200, 22);
+					passwordText.setBounds(160, 40, 150, 22);
 					JPasswordField confirm = new JPasswordField();
-					confirm.setBounds(140, 75, 200, 20);
+					confirm.setBounds(160, 75, 150, 20);
+					
+					if(confirm.getText().equals(passwordText.getText()))
+						updatePassword(username.getText(), confirmPassword.getText());
 					
 					passwordReset.add(confirmPassword);
 					passwordReset.add(password);
@@ -282,7 +291,7 @@ public class LogIn extends JFrame{
 		mainPanel.add(passwordReset, "resetPassword");
 	}
 	
-	private boolean createAccount(String user, String password) {
+	private boolean createAccount(String username, String password) {
 		final String logInCluster = "mongodb://user_1:Passw0rd1@pomodoro-shard-00-01.jnyc8.mongodb.net:27017/users?ssl=true&replicaSet=atlas-nqzfih-shard-0&authSource=admin&retryWrites=true";
 		final String dbName = "users";
 		
@@ -290,7 +299,7 @@ public class LogIn extends JFrame{
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		
-		BasicDBObject query = new BasicDBObject("username", user);
+		BasicDBObject query = new BasicDBObject("username", username);
 		MongoCollection<Document> collection = database.getCollection("credentials");
 		
 		Document doesExist = new Document();
@@ -299,7 +308,7 @@ public class LogIn extends JFrame{
 		//tests to see if the collection in our user name log on cluster exists
 		if(doesExist == null) {
 			
-			Document insert = new Document("username", user).append("password", password);
+			Document insert = new Document("username", username).append("password", password);
 			collection.insertOne(insert);
 			JOptionPane.showMessageDialog(null, "Your account was successfully created");
 			mongoClient.close();
@@ -332,6 +341,20 @@ public class LogIn extends JFrame{
 		return doesExist != null;
 	}
 	
+	private void updatePassword(String username, String password) {
+		
+		final String logInCluster = "mongodb://user_1:Passw0rd1@pomodoro-shard-00-01.jnyc8.mongodb.net:27017/users?ssl=true&replicaSet=atlas-nqzfih-shard-0&authSource=admin&retryWrites=true";
+		final String dbName = "users";
+		
+		MongoClientURI uri = new MongoClientURI(logInCluster);
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase database = mongoClient.getDatabase(dbName);
+		MongoCollection<Document> collection = database.getCollection("credentials");
+		
+		collection.updateOne(Filters.eq("username", username),Updates.set("password", password));
+		
+		mongoClient.close();
+	}
 	public static void main(String[] args) {
 		LogIn menu = new LogIn();
 		menu.setVisible(true);
