@@ -27,6 +27,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
+import mongoDB.Mongo;
+
 public class LogIn extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
@@ -324,11 +326,9 @@ public class LogIn extends JFrame{
 	}
 	
 	private boolean createAccount(String username, String password) {
-		final String logInCluster = "mongodb://user_1:Passw0rd1@pomodoro-shard-00-01.jnyc8.mongodb.net:27017/users?ssl=true&replicaSet=atlas-nqzfih-shard-0&authSource=admin&retryWrites=true";
 		final String dbName = "users";
 		
-		MongoClientURI uri = new MongoClientURI(logInCluster);
-		MongoClient mongoClient = new MongoClient(uri);
+		MongoClient mongoClient = mongo.connectDatabase(dbName);
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		
 		BasicDBObject query = new BasicDBObject("username", username);
@@ -356,11 +356,9 @@ public class LogIn extends JFrame{
 	
 	private boolean doesUsernameExist(String username) {
 		
-		final String logInCluster = "mongodb://user_1:Passw0rd1@pomodoro-shard-00-01.jnyc8.mongodb.net:27017/users?ssl=true&replicaSet=atlas-nqzfih-shard-0&authSource=admin&retryWrites=true";
 		final String dbName = "users";
 		
-		MongoClientURI uri = new MongoClientURI(logInCluster);
-		MongoClient mongoClient = new MongoClient(uri);
+		MongoClient mongoClient = mongo.connectDatabase(dbName);
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		
 		BasicDBObject query = new BasicDBObject("username", username);
@@ -375,11 +373,9 @@ public class LogIn extends JFrame{
 	
 	private void updatePassword(String username, String password) {
 		
-		final String logInCluster = "mongodb://user_1:Passw0rd1@pomodoro-shard-00-01.jnyc8.mongodb.net:27017/users?ssl=true&replicaSet=atlas-nqzfih-shard-0&authSource=admin&retryWrites=true";
 		final String dbName = "users";
 		
-		MongoClientURI uri = new MongoClientURI(logInCluster);
-		MongoClient mongoClient = new MongoClient(uri);
+		MongoClient mongoClient = mongo.connectDatabase(dbName);
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		MongoCollection<Document> collection = database.getCollection("credentials");
 
