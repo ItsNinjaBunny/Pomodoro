@@ -32,6 +32,7 @@ public class LogIn extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private CardLayout cardLayout; 
 	private JPanel mainPanel;
+	private Mongo mongo = new Mongo();
 
 	public LogIn() {
 		
@@ -305,7 +306,7 @@ public class LogIn extends JFrame{
 				String password, username, confirmed;
 				password = passwordText.getText();
 				username = userText.getText();
-				confirmed = confirm.getText();
+				confirmed = confirm.getText(); 
 				
 				if(password.equals(confirmed)) {
 					updatePassword(username, password);
