@@ -225,6 +225,7 @@ public class LogIn extends JFrame{
 		mainPanel.add(panel, "createAccount");
 	}
 
+	@SuppressWarnings("deprecation")
 	private void resetPassword() {
 		JPanel passwordReset = new JPanel();
 		
@@ -256,6 +257,23 @@ public class LogIn extends JFrame{
 		JButton update = new JButton("update");
 		update.setBounds(227, 145, 50, 20);
 		
+		passwordReset.add(update);
+		
+		JLabel passwordLabel = new JLabel("new password: "); 
+		JLabel confirmPassword = new JLabel("confirm: ");
+		JPasswordField passwordText = new JPasswordField();
+		JPasswordField confirm = new JPasswordField();
+		passwordLabel.setVisible(false);
+		confirmPassword.setVisible(false);
+		passwordText.setVisible(false);
+		confirm.setVisible(false);
+		
+		passwordLabel.setBounds(50, 40, 150, 20);
+		confirmPassword.setBounds(50, 75, 150, 20);
+		passwordText.setBounds(160, 40, 150, 22);
+		passwordText.setBounds(160, 40, 150, 22);
+		confirm.setBounds(160, 75, 150, 20);
+		
 		reset.addActionListener(new ActionListener() {
 			
 			@Override
@@ -266,27 +284,40 @@ public class LogIn extends JFrame{
 					username.setVisible(false);
 					userText.setVisible(false);
 					
-					JLabel password = new JLabel("new password: ");
-					password.setBounds(20, 40, 150, 20);
-					JLabel confirmPassword = new JLabel("confirm: ");
-					confirmPassword.setBounds(50, 75, 150, 20);
-					JPasswordField passwordText = new JPasswordField();
-					passwordText.setBounds(160, 40, 150, 22);
-					JPasswordField confirm = new JPasswordField();
-					confirm.setBounds(160, 75, 150, 20);
+					reset.setVisible(false);;
+					update.setVisible(true);
+					getRootPane().setDefaultButton(update);
 					
-					if(confirm.getText().equals(passwordText.getText()))
-						updatePassword(username.getText(), confirmPassword.getText());
-					
-					passwordReset.add(confirmPassword);
-					passwordReset.add(password);
-					passwordReset.add(passwordText);
-					passwordReset.add(confirm);
-					
+					passwordLabel.setVisible(true);
+					confirmPassword.setVisible(true);
+					passwordText.setVisible(true);
+					confirm.setVisible(true);
+						
 					passwordReset.revalidate();
 				}
 			}
+		});		
+		
+		update.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String password, username, confirmed;
+				password = passwordText.getText();
+				username = userText.getText();
+				confirmed = confirm.getText();
+				
+				if(password.equals(confirmed)) {
+					updatePassword(username, password);
+				}
+			}
 		});
+		passwordReset.add(confirmPassword);
+		passwordReset.add(passwordLabel);
+		passwordReset.add(passwordText);
+		passwordReset.add(confirm);
+			
+		passwordReset.revalidate();
 		
 		mainPanel.add(passwordReset, "resetPassword");
 	}
@@ -350,11 +381,12 @@ public class LogIn extends JFrame{
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		MongoCollection<Document> collection = database.getCollection("credentials");
-		
-		collection.updateOne(Filters.eq("username", username),Updates.set("password", password));
-		
+
+		collection.updateOne(Filters.eq("username", username), Updates.set("password", password));
+
 		mongoClient.close();
 	}
+	
 	public static void main(String[] args) {
 		LogIn menu = new LogIn();
 		menu.setVisible(true);
