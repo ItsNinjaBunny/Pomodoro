@@ -4,6 +4,8 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -36,8 +38,16 @@ public class LogIn extends JFrame{
 	private Mongo mongo = new Mongo();
 	private JButton go = new JButton("go");
 	private JButton reset = new JButton("reset");
-	private JButton update = new JButton("update");
-	private JButton create = new JButton("create account");
+	private Point location = new Point(100, 100);
+	
+
+	public Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(Point location) {
+		this.location = location;
+	}
 
 	public LogIn() {
 		
@@ -45,9 +55,10 @@ public class LogIn extends JFrame{
 		mainPanel = new JPanel(cardLayout);
 		loginPane();
 		
-		
+		setResizable(false);
 		this.setContentPane(mainPanel);
 		this.setTitle("Pomodoro.exe");
+		this.setIconImage(Toolkit.getDefaultToolkit().getImage("/Users/braydenwong/git/Pomodoro-App-with-Java-CSE215/src/Main/logo.png"));
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setBounds(100, 100, 400, 150);
 		this.setPreferredSize(new Dimension(400, 175));
@@ -163,11 +174,15 @@ public class LogIn extends JFrame{
 				
 				if(accountExist(username, password)) {
 					JOptionPane.showMessageDialog(login, "login successful");
-					int x = (int) getX();
-					int y = (int) getY();
+					Point location = getLocation();
 					dispose();
-					ActivityPage activityPage = new ActivityPage(x, y, username);
+					ActivityPage activityPage = new ActivityPage(location, username);
 					activityPage.setVisible(true);
+				}
+				else {
+					JOptionPane.showMessageDialog(mainPanel, "username or password is incorrect");
+					userText.setText("");
+					passwordText.setText("");
 				}
 			}
 		});
@@ -440,7 +455,7 @@ public class LogIn extends JFrame{
 			
 			Document insert = new Document("_id", id).append("username", username).append("password", password);
 			collection.insertOne(insert);
-			JOptionPane.showMessageDialog(null, "Your account was successfully created");
+			JOptionPane.showMessageDialog(mainPanel, "Your account was successfully created");
 			mongoClient.close();
 			return true;
 		}
@@ -489,7 +504,6 @@ public class LogIn extends JFrame{
 		mongoClient.close();
 		
 		if(result == null) {
-			JOptionPane.showMessageDialog(null, "username or password is incorrect");
 			return false;
 		}
 		else {
