@@ -21,7 +21,6 @@ import org.bson.Document;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -35,6 +34,10 @@ public class LogIn extends JFrame{
 	private CardLayout cardLayout; 
 	private JPanel mainPanel;
 	private Mongo mongo = new Mongo();
+	private JButton go = new JButton("go");
+	private JButton reset = new JButton("reset");
+	private JButton update = new JButton("update");
+	private JButton create = new JButton("create account");
 
 	public LogIn() {
 		
@@ -46,17 +49,18 @@ public class LogIn extends JFrame{
 		this.setContentPane(mainPanel);
 		this.setTitle("Pomodoro.exe");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 400, 200);
-		//this.setPreferredSize(new Dimension(400, 300));
+		this.setBounds(100, 100, 400, 150);
+		this.setPreferredSize(new Dimension(400, 175));
 		this.pack();
 		this.revalidate();
+		
 	}
 	
 	private void loginPane() {
 	    
 		JPanel login = new JPanel();
 		login.setLayout(null);
-		login.setPreferredSize(new Dimension(400, 200));
+		login.setPreferredSize(new Dimension(400, 175));
 		
 		JLabel createAcc = new JLabel("create an account");
 		createAcc.setBounds(250, 30, 130, 20);
@@ -142,9 +146,33 @@ public class LogIn extends JFrame{
 		//password fields
 		JLabel password = new JLabel("password: ");
 		JPasswordField passwordText = new JPasswordField();
-		passwordText.setBounds(110, 60, 100, 22);
-		password.setBounds(20, 60, 90, 20);
+		passwordText.setBounds(110, 65, 100, 22);
+		password.setBounds(20, 65, 90, 20);
 		
+		JButton go = new JButton("Login");
+		go.setBounds(135, 105, 50, 20);
+		getRootPane().setDefaultButton(go);
+		go.addActionListener(new ActionListener() {
+			
+			@SuppressWarnings("deprecation")
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				String username = userText.getText();
+				String password = passwordText.getText();
+				
+				if(accountExist(username, password)) {
+					JOptionPane.showMessageDialog(login, "login successful");
+					int x = (int) getX();
+					int y = (int) getY();
+					dispose();
+					ActivityPage activityPage = new ActivityPage(x, y, username);
+					activityPage.setVisible(true);
+				}
+			}
+		});
+		
+		login.add(go);
 		login.add(username);
 		login.add(password);
 		login.add(passwordText);
@@ -161,33 +189,44 @@ public class LogIn extends JFrame{
 		panel.setLayout(null);
 		
 		JButton createAcc = new JButton("Create Account");
-		createAcc.setBounds(227, 145, 110, 22);		
+		createAcc.setBounds(227, 110, 110, 22);
+		getRootPane().setDefaultButton(createAcc);
 		panel.add(createAcc);
 		
 		JButton back = new JButton("back");
-		back.setBounds(50, 145, 50, 22);
+		back.setBounds(50, 110, 50, 22);
 		panel.add(back);
 		
 		JLabel username = new JLabel("username: ");
 		JTextField userText = new JTextField();
-		username.setBounds(50, 40, 90, 20);
-		userText.setBounds(140, 40, 200, 22);
+		username.setBounds(50, 10, 90, 20);
+		userText.setBounds(140, 10, 200, 22);
+		
+		/*
+		 * JLabel passwordComp = new
+		 * JLabel("minimum 8 characters, 1 uppercase, lowercase, numeric value, and symbol"
+		 * ); String font = String.valueOf(passwordComp.getFont());
+		 * passwordComp.setFont(new Font(font, Font.BOLD, 10));;
+		 * passwordComp.setBounds(20, 120, 400, 30); panel.add(passwordComp);
+		 */
 		
 		
 		JLabel password = new JLabel("password: ");
 		JLabel confirm = new JLabel("confirm: ");
 		JPasswordField confirmedPassword = new JPasswordField();
 		JPasswordField passwordText = new JPasswordField();
-		password.setBounds(50, 75, 90, 20);
-		passwordText.setBounds(140, 75, 200, 22);
-		confirm.setBounds(50, 110, 90, 20);
-		confirmedPassword.setBounds(140, 110, 200, 22);	
+		password.setBounds(50, 45, 90, 22);
+		passwordText.setBounds(140, 45, 200, 22);
+		confirm.setBounds(50, 80, 90, 22);
+		confirmedPassword.setBounds(140, 80, 200, 22);	
 		
 		back.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(mainPanel, "login");
+				getRootPane().setDefaultButton(go);
+				revalidate();
 			}
 			
 		});
@@ -201,17 +240,22 @@ public class LogIn extends JFrame{
 				username = userText.getText();
 				confirmed = confirmedPassword.getText();
 				if(password.equals(confirmed)) {
-					if(createAccount(username, password)) {
-						cardLayout.show(mainPanel, "login");
-					}
+					//if(validatePasswordComplexity(password)) {
+						if(createAccount(username, password)) {
+							cardLayout.show(mainPanel, "login");
+							getRootPane().setDefaultButton(go);
+							revalidate();
+						}
+/*					}
 					else {
+						JOptionPane.showMessageDialog(null, "password doesn't meet password complexity");
 						userText.setText("");
 						passwordText.setText("");
 						confirmedPassword.setText("");
-					}
+					}*/
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "Passwords are not the same. Please try again.");
+					JOptionPane.showMessageDialog(createAcc, "Passwords are not the same. Please try again.");
 					userText.setText("");
 					passwordText.setText("");
 					confirmedPassword.setText("");
@@ -231,9 +275,7 @@ public class LogIn extends JFrame{
 	@SuppressWarnings("deprecation")
 	private void resetPassword() {
 		JPanel passwordReset = new JPanel();
-		
 		passwordReset.setLayout(null);
-		passwordReset.setBounds(100, 100, 400, 200);
 		
 		JLabel username = new JLabel("username: ");
 		JTextField userText = new JTextField();
@@ -242,23 +284,26 @@ public class LogIn extends JFrame{
 		passwordReset.add(username);
 		passwordReset.add(userText);
 		
+		
+		
 		JButton back = new JButton("back");
-		back.setBounds(50, 145, 50, 20);
+		back.setBounds(50, 100, 50, 20);
 		back.addActionListener(new ActionListener() {
 			
 			@Override 
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(mainPanel, "login");
+				getRootPane().setDefaultButton(go);
+				revalidate();
 			}
 		});
 		passwordReset.add(back);
 		
-		JButton reset = new JButton("reset");
-		reset.setBounds(227, 145, 50, 20);
+		reset.setBounds(227, 100, 50, 20);
 		passwordReset.add(reset);
 		getRootPane().setDefaultButton(reset);
 		JButton update = new JButton("update");
-		update.setBounds(227, 145, 50, 20);
+		update.setBounds(227, 100, 50, 20);
 		
 		passwordReset.add(update);
 		
@@ -271,11 +316,10 @@ public class LogIn extends JFrame{
 		passwordText.setVisible(false);
 		confirm.setVisible(false);
 		
-		passwordLabel.setBounds(50, 40, 150, 20);
-		confirmPassword.setBounds(50, 75, 150, 20);
-		passwordText.setBounds(160, 40, 150, 22);
-		passwordText.setBounds(160, 40, 150, 22);
-		confirm.setBounds(160, 75, 150, 20);
+		passwordLabel.setBounds(50, 25, 150, 20);
+		confirmPassword.setBounds(50, 60, 150, 20);
+		passwordText.setBounds(160, 25, 150, 20);
+		confirm.setBounds(160, 60, 150, 20);
 		
 		reset.addActionListener(new ActionListener() {
 			
@@ -295,9 +339,24 @@ public class LogIn extends JFrame{
 					confirmPassword.setVisible(true);
 					passwordText.setVisible(true);
 					confirm.setVisible(true);
+					
+					/*
+					 * JLabel passwordComp = new
+					 * JLabel("minimum 8 characters, 1 uppercase, lowercase, numeric value, and symbol"
+					 * ); String font = String.valueOf(passwordComp.getFont());
+					 * passwordComp.setFont(new Font(font, Font.BOLD, 12));;
+					 * passwordComp.setBounds(20, 90, 425, 30); passwordComp.setVisible(true);
+					 * passwordReset.add(passwordComp);
+					 */
 						
 					passwordReset.revalidate();
 				}
+				else {
+					userText.setText("");
+					passwordText.setText("");
+					confirm.setText("");
+				}
+				passwordReset.revalidate();
 			}
 		});		
 		
@@ -311,9 +370,20 @@ public class LogIn extends JFrame{
 				confirmed = confirm.getText(); 
 				
 				if(password.equals(confirmed)) {
-					updatePassword(username, password);
+					//if(validatePasswordComplexity(password)) {
+						updatePassword(username, password);
+						JOptionPane.showMessageDialog(passwordReset, "your password was successfully updated");
+						cardLayout.show(mainPanel, "login");
+						getRootPane().setDefaultButton(go);
+						revalidate();
+					}
+					else {
+						JOptionPane.showMessageDialog(passwordReset, "password does not meet password requirements");
+						passwordText.setText("");
+						confirm.setText("");
+					}
 				}
-			}
+			//}
 		});
 		passwordReset.add(confirmPassword);
 		passwordReset.add(passwordLabel);
@@ -340,14 +410,41 @@ public class LogIn extends JFrame{
 		//tests to see if the collection in our user name log on cluster exists
 		if(doesExist == null) {
 			
-			Document insert = new Document("username", username).append("password", password);
+			int docID = 1;
+			int id = 0;
+			
+			BasicDBObject getID = new BasicDBObject("_id", docID);
+			boolean isValid = true;
+			Document nextID;
+			
+			nextID = collection.find(getID).first();
+			do {
+				
+				if(nextID == null) {
+					id = docID;
+					isValid = false;
+					System.out.println(id);
+					break;
+				}
+				else {
+					nextID.clear();
+					getID.clear();
+					System.out.println(docID);
+					docID++;
+					getID.append("_id", docID);
+					nextID = collection.find(getID).first();
+					System.out.println(nextID);
+					
+				}
+			}while(isValid);
+			
+			Document insert = new Document("_id", id).append("username", username).append("password", password);
 			collection.insertOne(insert);
 			JOptionPane.showMessageDialog(null, "Your account was successfully created");
 			mongoClient.close();
 			return true;
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "This username already exists try another one");
 			mongoClient.close();
 			return false;
 		}
@@ -371,6 +468,36 @@ public class LogIn extends JFrame{
 		return doesExist != null;
 	}
 	
+	/*
+	 * private boolean validatePasswordComplexity(String password) {
+	 * 
+	 * String regex =
+	 * "^(?=.*\\d{1,})(?=.*[a-z]{1,})(?=.*[A-Z]{1,})(?=.*[!@#$%]{1,}).{8,20}$";
+	 * return password.matches(regex); }
+	 */
+	
+	private boolean accountExist(String username, String password) {
+		
+		final String dbName = "users";
+		
+		MongoClient mongoClient = mongo.connectDatabase(dbName);
+		MongoDatabase database = mongoClient.getDatabase(dbName);
+		MongoCollection<Document> collection = database.getCollection("credentials");
+		
+		BasicDBObject query = new BasicDBObject("username", username).append("password", password);
+		Document result = collection.find(query).first();
+		mongoClient.close();
+		
+		if(result == null) {
+			JOptionPane.showMessageDialog(null, "username or password is incorrect");
+			return false;
+		}
+		else {
+			return true;
+		}
+		
+	}
+	
 	private void updatePassword(String username, String password) {
 		
 		final String dbName = "users";
@@ -387,6 +514,5 @@ public class LogIn extends JFrame{
 	public static void main(String[] args) {
 		LogIn menu = new LogIn();
 		menu.setVisible(true);
-		
 	}
 }
