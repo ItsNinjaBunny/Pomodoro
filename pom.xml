@@ -3,7 +3,11 @@
   <groupId>idk</groupId>
   <artifactId>Pomodoro</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Pomodoro</name>
+	<properties>
+		<maven.compiler.source>16</maven.compiler.source>
+		<maven.compiler.target>16</maven.compiler.target>
+	</properties>
+	<name>Pomodoro</name>
   
   <dependencies>  
 		<dependency>  

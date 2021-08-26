@@ -38,16 +38,7 @@ public class LogIn extends JFrame{
 	private Mongo mongo = new Mongo();
 	private JButton go = new JButton("go");
 	private JButton reset = new JButton("reset");
-	private Point location = new Point(100, 100);
-	
-
-	public Point getLocation() {
-		return location;
-	}
-
-	public void setLocation(Point location) {
-		this.location = location;
-	}
+	private Point location = new Point();
 
 	public LogIn() {
 		
@@ -60,17 +51,20 @@ public class LogIn extends JFrame{
 		this.setTitle("Pomodoro.exe");
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage("/Users/braydenwong/git/Pomodoro-App-with-Java-CSE215/src/Main/logo.png"));
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 400, 150);
 		this.setPreferredSize(new Dimension(400, 175));
+		this.setLocationRelativeTo(null);
 		this.pack();
 		this.revalidate();
 		
 	}
 	
+	  
+	
 	private void loginPane() {
 	    
 		JPanel login = new JPanel();
 		login.setLayout(null);
+		
 		login.setPreferredSize(new Dimension(400, 175));
 		
 		JLabel createAcc = new JLabel("create an account");
@@ -174,8 +168,9 @@ public class LogIn extends JFrame{
 				
 				if(accountExist(username, password)) {
 					JOptionPane.showMessageDialog(login, "login successful");
-					Point location = getLocation();
+					location = getLocation();
 					dispose();
+					
 					ActivityPage activityPage = new ActivityPage(location, username);
 					activityPage.setVisible(true);
 				}
@@ -410,10 +405,11 @@ public class LogIn extends JFrame{
 		mainPanel.add(passwordReset, "resetPassword");
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean createAccount(String username, String password) {
 		final String dbName = "users";
 		
-		MongoClient mongoClient = mongo.connectDatabase(dbName);
+		MongoClient mongoClient = mongo.connectDatabase();
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		
 		BasicDBObject query = new BasicDBObject("username", username);
@@ -453,6 +449,12 @@ public class LogIn extends JFrame{
 				}
 			}while(isValid);
 			
+			int index = mongoClient.getDatabaseNames().indexOf(username);
+			if(index == -1) {
+				MongoDatabase databaseTemp = mongoClient.getDatabase(username);
+				databaseTemp.createCollection("logs");
+			}
+			
 			Document insert = new Document("_id", id).append("username", username).append("password", password);
 			collection.insertOne(insert);
 			JOptionPane.showMessageDialog(mainPanel, "Your account was successfully created");
@@ -470,7 +472,7 @@ public class LogIn extends JFrame{
 		
 		final String dbName = "users";
 		
-		MongoClient mongoClient = mongo.connectDatabase(dbName);
+		MongoClient mongoClient = mongo.connectDatabase();
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		
 		BasicDBObject query = new BasicDBObject("username", username);
@@ -495,7 +497,7 @@ public class LogIn extends JFrame{
 		
 		final String dbName = "users";
 		
-		MongoClient mongoClient = mongo.connectDatabase(dbName);
+		MongoClient mongoClient = mongo.connectDatabase();
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		MongoCollection<Document> collection = database.getCollection("credentials");
 		
@@ -516,7 +518,7 @@ public class LogIn extends JFrame{
 		
 		final String dbName = "users";
 		
-		MongoClient mongoClient = mongo.connectDatabase(dbName);
+		MongoClient mongoClient = mongo.connectDatabase();
 		MongoDatabase database = mongoClient.getDatabase(dbName);
 		MongoCollection<Document> collection = database.getCollection("credentials");
 

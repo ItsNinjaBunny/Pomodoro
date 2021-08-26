@@ -28,6 +28,5 @@ public class Timer extends JFrame {
 		pack();
 		revalidate();
 		
-		
 	}
 }
