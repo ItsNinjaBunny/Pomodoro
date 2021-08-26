@@ -453,6 +453,7 @@ public class LogIn extends JFrame{
 			if(index == -1) {
 				MongoDatabase databaseTemp = mongoClient.getDatabase(username);
 				databaseTemp.createCollection("logs");
+				databaseTemp.createCollection("tasks");
 			}
 			
 			Document insert = new Document("_id", id).append("username", username).append("password", password);

@@ -1,42 +1,40 @@
 package gui;
 
+import org.bson.Document;
+
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.Serial;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 
 public class ActivityPage extends JFrame{
 	
 	
+	@Serial
 	private static final long serialVersionUID = 8050119630303986305L;
 	
-	private JPanel activityPage = new JPanel(null);
-	private Point location;
-	private String username;
+	private final JPanel activityPage = new JPanel(null);
+	private final String username;
 	
-	private CardLayout cardLayout;
-	private JPanel mainPanel;
-	private JPanel logPage;
+	private final CardLayout cardLayout;
+	private final JPanel mainPanel;
 	
-	
+	public void setDimension(int x, int y) {
+		setPreferredSize(new Dimension(x, y));
+	}
 	
 	public ActivityPage(Point location, String username) {
 		
 		this.username = username;
-		this.location = location;
-		
+		JFrame frame = new JFrame();
+		frame = this;
+
 		cardLayout = new CardLayout();
 		mainPanel = new JPanel(cardLayout);
 		createActivityPage();
@@ -44,12 +42,15 @@ public class ActivityPage extends JFrame{
 		this.setContentPane(mainPanel);
 		mainPanel.add(activityPage, "home");
 		
-		ActivityLog log = new ActivityLog(username);
-		log.log(mainPanel);
+		ActivityLog log = new ActivityLog(cardLayout, getUsername());
+		log.log(mainPanel, frame);
+
+		Tasks task = new Tasks(cardLayout, getUsername());
+		task.createTask(mainPanel, frame);
 		
 
-		setLocation(this.location);
-		setPreferredSize(new Dimension(500, 500));
+		setLocation(location);
+		setDimension(500, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		revalidate();
@@ -59,20 +60,22 @@ public class ActivityPage extends JFrame{
 		
 		
 		activityPage.setBackground(Color.white);
+
 		setTitle("Activity Page");
 		
 		toActivityLog();
+		toTaskPage();
 		
 		pack();
 		
 	}
 	
 
-	public String getUsername() {
+	private String getUsername() {
 		return username;
 	}
 	
-	public void toActivityLog() {
+	private void toActivityLog() {
 		
 		JLabel activityLog = new JLabel(new ImageIcon("/Users/braydenwong/git/Pomodoro/images/act.png"));
 		
@@ -83,7 +86,9 @@ public class ActivityPage extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
+				setDimension(500, 400);
+				pack();
 				cardLayout.show(mainPanel, "log");
 				
 			}
@@ -112,13 +117,55 @@ public class ActivityPage extends JFrame{
 				
 				activityLog.setCursor(Cursor.getDefaultCursor());
 			}
-			
-			
 		});
 		activityPage.add(activityLog);
-		
 	}
-	
+
+	private void toTaskPage() {
+
+		JLabel taskLog = new JLabel(new ImageIcon("/Users/braydenwong/git/Pomodoro/images/pomo.png"));
+		taskLog.setBounds(100, 95, 300, 50);
+		taskLog.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+				setDimension(500, 350);
+				pack();
+				cardLayout.show(mainPanel, "tasks");
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				taskLog.setCursor((Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+				taskLog.setCursor(Cursor.getDefaultCursor());
+			}
+		});
+		activityPage.add(taskLog);
+	}
+
+
 	public static void main(String[] args) {
 	
 		ActivityPage activity = new ActivityPage(new Point(500,500), "darkSlayer25");

@@ -2,6 +2,7 @@
 package mongoDB;
 
 import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
 
 import com.mongodb.client.model.Sorts;
 import org.bson.Document;
@@ -12,6 +13,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Mongo {
@@ -30,7 +32,7 @@ public class Mongo {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void getLogs(String username, DefaultListModel documents, List<String> sessionTimes) {
+	public void getLogs(String username, ArrayList<String[]> documents, List<String> sessionTimes) {
 		
 		MongoClient mongoClient = connectDatabase();
 		MongoDatabase database = mongoClient.getDatabase(username);
@@ -38,12 +40,47 @@ public class Mongo {
 		
 		FindIterable<Document> iterDoc = collection.find().sort(Sorts.ascending("sessionID"));
 
-		for (Document tempDoc : iterDoc) {
-			documents.addElement("Session ID: " + String.valueOf(tempDoc.get("sessionID") + "\t Session Time: " + String.valueOf(tempDoc.get("sessionLength"))));
-			String session = String.valueOf(tempDoc.get("sessionLength")).replace(":", ".");
+		for (Document doc : iterDoc) {
+			documents.add(new String[] {String.valueOf(doc.get("sessionID")), String.valueOf(doc.get("sessionLength"))});
+			String session = String.valueOf(doc.get("sessionLength")).replace(":", ".");
 			sessionTimes.add(session);
 		}
 		
+		mongoClient.close();
+	}
+
+	public void getTasks(String username, ArrayList<String[]> documents) {
+		final String tasks = "tasks";
+
+		MongoClient mongoClient = connectDatabase();
+		MongoDatabase database = mongoClient.getDatabase(username);
+		MongoCollection<Document> collection = database.getCollection(tasks);
+
+
+
+		FindIterable<Document> iterDoc = collection.find().sort(Sorts.ascending("_id"));
+		for(Document doc : iterDoc) {
+
+			documents.add(new String[] { String.valueOf(doc.get("_id")), String.valueOf(doc.get("task name")), String.valueOf(doc.get("date added")), String.valueOf(doc.get("date completed"))});
+
+		}
+		mongoClient.close();
+	}
+
+	public void insertTask(ArrayList<String[]> taskLog, String username, String task, String date) {
+		final String tasks = "tasks";
+
+		MongoClient mongoClient = connectDatabase();
+		MongoDatabase database = mongoClient.getDatabase(username);
+		MongoCollection<Document> collection = database.getCollection(tasks);
+
+		int count = (int) collection.count();
+		Document doc = new Document();
+		doc.append("_id", count+1).append("task name", task).append("date added", date).append("date completed", "---");
+		collection.insertOne(doc);
+
+		taskLog.add(new String[] { String.valueOf(doc.get("_id")), String.valueOf(doc.get("task name")), String.valueOf(doc.get("date added")), String.valueOf(doc.get("date completed"))});
+
 		mongoClient.close();
 	}
 }

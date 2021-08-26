@@ -1,12 +1,13 @@
 package gui;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import mongoDB.Mongo;
 
@@ -14,7 +15,8 @@ public class ActivityLog {
 	
 	private final String username;
 	private final Mongo mongo = new Mongo();
-	private final DefaultListModel actList = new DefaultListModel();
+	private final ArrayList<String[]> logs = new ArrayList<>();
+	private final CardLayout cardLayout;
 
 	private int m = 0;
 	private int h = 0;
@@ -26,26 +28,27 @@ public class ActivityLog {
 		return this.username;
 	}
 	
-	public ActivityLog(String username) {
-		
+	public ActivityLog(CardLayout cardLayout, String username) {
+
+		this.cardLayout = cardLayout;
 		this.username = username;
 	}
 		
 	@SuppressWarnings("rawtypes")
-	public void log(JPanel mainPanel) {
+	public void log(JPanel mainPanel, JFrame frame) {
 		JPanel activityLog = new JPanel(null);
 		List<String> sessionTimes = new ArrayList<>();
-		
-		activityLog.setPreferredSize(new Dimension(500, 500));
-		JList list = getLogs(sessionTimes);
-		list.setVisibleRowCount(5);
-		list.setLayoutOrientation(JList.VERTICAL);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+		frame.setPreferredSize(new Dimension(500, 350));
+		frame.pack();
+		//JList list = getLogs(sessionTimes);
+		DefaultTableModel model = getLogs(sessionTimes, logs);
+
+		JTable table = new JTable(model);
 
 
 		for (String sessionTime : sessionTimes) {
-			m += (int) Double.parseDouble(sessionTime) % 60;
+			m += (int) Double.parseDouble(sessionTime);
 			if(m >= 60) {
 				h += 1;
 				m = Math.abs(m - 60);
@@ -61,7 +64,7 @@ public class ActivityLog {
 		days = String.valueOf(d);
 
 
-		JScrollPane scroller = new JScrollPane(list);
+		JScrollPane scroller = new JScrollPane(table);
 		scroller.setBounds(10, 10, 480, 300);
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -70,7 +73,7 @@ public class ActivityLog {
 
 		JLabel session = new JLabel();
 		session.setBounds(30, 310, 200, 30);
-		session.setText("days: " + days + " hours: " + hours + " minutes: " + minutes);
+		session.setText("Days: " + days + " Hours: " + hours + " Minutes: " + minutes);
 
 		JButton update = new JButton("update");
 		update.setBounds(350, 310, 68, 30);
@@ -79,39 +82,55 @@ public class ActivityLog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				for(int i = 0; i < sessionTimes.size(); i++) {
-					System.out.println(sessionTimes.get(i));
-					sessionTimes.remove(i);
-				}
-				actList.clear();
+				sessionTimes.clear();
+				logs.clear();
+				table.removeAll();
+				DefaultTableModel model = getLogs(sessionTimes, logs);
+				table.setModel(model);
+				//mongo.getLogs(getUsername(), logs, sessionTimes);
 
-				list.removeAll();
-				mongo.getLogs(getUsername(), actList, sessionTimes);
+
 				m = 0;
-				h= 0;
+				h = 0;
 				d = 0;
 
+
 				for (String sessionTime : sessionTimes) {
-					m += (int) Double.parseDouble(sessionTime) % 60;
+					System.out.println(sessionTime);
+					m += (int) Double.parseDouble(sessionTime);
+					System.out.println(m);
 					if(m >= 60) {
 						h += 1;
 						m = Math.abs(m - 60);
 					}
 					if(h >= 24) {
 						d += 1;
-						h = Math.abs(24 - h);
+						h = Math.abs(h - 24);
 					}
-					//System.out.println("hours: " + h + " minutes: " + m);
 				}
+
 				minutes = String.valueOf(m);
 				hours = String.valueOf(h);
 				days = String.valueOf(d);
 
-				session.setText("days: " + days + " hours: " + hours + " minutes: " + minutes);
+				session.setText("days: " + d + " hours: " + h + " minutes: " + m);
 				activityLog.revalidate();
 			}
 		});
 
+		JButton logOut = new JButton("home");
+		logOut.setBounds(10, 340, 45, 20);
+		logOut.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.setPreferredSize(new Dimension(500, 500));
+				frame.pack();
+				cardLayout.show(mainPanel, "home");
+			}
+		});
+
+		activityLog.add(logOut);
 		activityLog.add(update);
 		activityLog.add(session);
 		activityLog.add(scroller);
@@ -121,22 +140,14 @@ public class ActivityLog {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	
-	private JList getLogs(List<String> sessionTimes) {
+	private DefaultTableModel getLogs(List<String> sessionTimes, ArrayList<String[]> logs) {
 
-		mongo.getLogs(username, actList, sessionTimes);
-		return new JList(actList);
-	}
-	
-	public static void main(String[] args) {
 
-		JFrame frame = new JFrame();
-		frame.setBounds(100, 100, 500, 500);
-		
-		ActivityLog log = new ActivityLog("darkSlayer25");
-		JPanel panel = new JPanel();
-		log.log(panel);
-		frame.setContentPane(panel);
-		frame.pack();
-		frame.setVisible(true);
+		mongo.getLogs(username, logs, sessionTimes);
+		ArrayList<String> column = new ArrayList<>();
+		column.add("sessionID");
+		column.add("session Length");
+
+		return new DefaultTableModel(logs.toArray(new Object[][] {}), column.toArray());
 	}
 }
