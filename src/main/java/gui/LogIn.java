@@ -11,13 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import org.bson.Document;
 
@@ -29,6 +23,8 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
 import mongoDB.Mongo;
+
+import static javax.swing.UIManager.*;
 
 public class LogIn extends JFrame{
 	
@@ -529,6 +525,18 @@ public class LogIn extends JFrame{
 	}
 	
 	public static void main(String[] args) {
+
+		try {
+			setLookAndFeel(getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 		LogIn menu = new LogIn();
 		menu.setVisible(true);
 	}

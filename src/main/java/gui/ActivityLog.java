@@ -87,8 +87,6 @@ public class ActivityLog {
 				table.removeAll();
 				DefaultTableModel model = getLogs(sessionTimes, logs);
 				table.setModel(model);
-				//mongo.getLogs(getUsername(), logs, sessionTimes);
-
 
 				m = 0;
 				h = 0;
@@ -96,9 +94,7 @@ public class ActivityLog {
 
 
 				for (String sessionTime : sessionTimes) {
-					System.out.println(sessionTime);
 					m += (int) Double.parseDouble(sessionTime);
-					System.out.println(m);
 					if(m >= 60) {
 						h += 1;
 						m = Math.abs(m - 60);

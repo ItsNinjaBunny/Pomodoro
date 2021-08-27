@@ -2,15 +2,17 @@ package gui;
 
 import org.bson.Document;
 
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serial;
+import java.net.URL;
+import java.util.Objects;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class ActivityPage extends JFrame{
@@ -76,11 +78,20 @@ public class ActivityPage extends JFrame{
 	}
 	
 	private void toActivityLog() {
+
+
+		BufferedImage image = null;
+		try {
+			image =  ImageIO.read(new File("images/act.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		JLabel activityLog = new JLabel(new ImageIcon("/Users/braydenwong/git/Pomodoro/images/act.png"));
+		JLabel activityLog = new JLabel(new ImageIcon(image));
 		
 		activityLog.setBounds(100, 25, 300, 50);
-		
+
 		activityLog.addMouseListener(new MouseListener() {
 
 			@Override
@@ -90,19 +101,19 @@ public class ActivityPage extends JFrame{
 				setDimension(500, 400);
 				pack();
 				cardLayout.show(mainPanel, "log");
-				
+
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
@@ -114,7 +125,7 @@ public class ActivityPage extends JFrame{
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 				activityLog.setCursor(Cursor.getDefaultCursor());
 			}
 		});
@@ -123,7 +134,15 @@ public class ActivityPage extends JFrame{
 
 	private void toTaskPage() {
 
-		JLabel taskLog = new JLabel(new ImageIcon("/Users/braydenwong/git/Pomodoro/images/pomo.png"));
+		BufferedImage image = null;
+		try {
+			image =  ImageIO.read(new File("images/pomo.png"));
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		JLabel taskLog = new JLabel(new ImageIcon(image));
 		taskLog.setBounds(100, 95, 300, 50);
 		taskLog.addMouseListener(new MouseListener() {
 
