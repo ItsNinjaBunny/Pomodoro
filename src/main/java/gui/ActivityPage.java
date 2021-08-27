@@ -80,15 +80,10 @@ public class ActivityPage extends JFrame{
 	private void toActivityLog() {
 
 
-		BufferedImage image = null;
-		try {
-			image =  ImageIO.read(new File("images/act.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		URL url = ActivityPage.class.getResource("/resources/act.png");
+		ImageIcon icon = new ImageIcon(url);
 		
-		JLabel activityLog = new JLabel(new ImageIcon(image));
+		JLabel activityLog = new JLabel(icon);
 		
 		activityLog.setBounds(100, 25, 300, 50);
 
@@ -134,16 +129,11 @@ public class ActivityPage extends JFrame{
 
 	private void toTaskPage() {
 
-		BufferedImage image = null;
-		try {
-			image =  ImageIO.read(new File("images/pomo.png"));
-		} catch (IOException e) {
+		URL url = ActivityPage.class.getResource("/resources/todo.png");
+		ImageIcon icon = new ImageIcon(url);
 
-			e.printStackTrace();
-		}
-
-		JLabel taskLog = new JLabel(new ImageIcon(image));
-		taskLog.setBounds(100, 95, 300, 50);
+		JLabel taskLog = new JLabel(icon);
+		taskLog.setBounds(100, 150, 300, 50);
 		taskLog.addMouseListener(new MouseListener() {
 
 			@Override
