@@ -3,6 +3,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +34,7 @@ public class ActivityLog {
 		this.cardLayout = cardLayout;
 		this.username = username;
 	}
-		
-	@SuppressWarnings("rawtypes")
+
 	public void log(JPanel mainPanel, JFrame frame) {
 		JPanel activityLog = new JPanel(null);
 		List<String> sessionTimes = new ArrayList<>();
@@ -45,6 +45,8 @@ public class ActivityLog {
 		DefaultTableModel model = getLogs(sessionTimes, logs);
 
 		JTable table = new JTable(model);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
 
 
 		for (String sessionTime : sessionTimes) {
@@ -115,26 +117,34 @@ public class ActivityLog {
 		});
 
 		JButton logOut = new JButton("home");
-		logOut.setBounds(10, 340, 45, 20);
+		logOut.setBounds(10, 340, 60, 30);
 		logOut.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				frame.setTitle("Activity Page");
 				frame.setPreferredSize(new Dimension(500, 500));
 				frame.pack();
 				cardLayout.show(mainPanel, "home");
 			}
 		});
 
+		URL url = ActivityPage.class.getResource("/resources/homebg.png");
+		ImageIcon icon = new ImageIcon(url);
+
+		JLabel background = new JLabel(icon);
+		background.setBounds(0, 0, 500, 400);
+
+
 		activityLog.add(logOut);
 		activityLog.add(update);
 		activityLog.add(session);
 		activityLog.add(scroller);
+		activityLog.add(background);
 
 		mainPanel.add(activityLog, "log");
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	
 	private DefaultTableModel getLogs(List<String> sessionTimes, ArrayList<String[]> logs) {
 
@@ -143,6 +153,7 @@ public class ActivityLog {
 		ArrayList<String> column = new ArrayList<>();
 		column.add("sessionID");
 		column.add("session Length");
+		column.add("date");
 
 		return new DefaultTableModel(logs.toArray(new Object[][] {}), column.toArray());
 	}

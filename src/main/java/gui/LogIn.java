@@ -6,10 +6,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 import javax.swing.*;
 
@@ -149,10 +146,43 @@ public class LogIn extends JFrame{
 		JPasswordField passwordText = new JPasswordField();
 		passwordText.setBounds(110, 65, 100, 22);
 		password.setBounds(20, 65, 90, 20);
+		passwordText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String username = userText.getText();
+					String password = passwordText.getText();
+
+					if(accountExist(username, password)) {
+						JOptionPane.showMessageDialog(login, "login successful");
+						location = getLocation();
+						dispose();
+
+						ActivityPage activityPage = new ActivityPage(location, username);
+						activityPage.setVisible(true);
+					}
+					else {
+						JOptionPane.showMessageDialog(mainPanel, "username or password is incorrect");
+						userText.setText("");
+						passwordText.setText("");
+					}
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+		});
+
 		
 		JButton go = new JButton("Login");
-		go.setBounds(135, 105, 50, 20);
-		getRootPane().setDefaultButton(go);
+		go.setBounds(135, 105, 70, 30);
 		go.addActionListener(new ActionListener() {
 			
 			@SuppressWarnings("deprecation")
@@ -195,12 +225,11 @@ public class LogIn extends JFrame{
 		panel.setLayout(null);
 		
 		JButton createAcc = new JButton("Create Account");
-		createAcc.setBounds(227, 110, 110, 22);
-		getRootPane().setDefaultButton(createAcc);
+		createAcc.setBounds(200, 110, 130, 30);
 		panel.add(createAcc);
 		
 		JButton back = new JButton("back");
-		back.setBounds(50, 110, 50, 22);
+		back.setBounds(50, 110, 70, 30);
 		panel.add(back);
 		
 		JLabel username = new JLabel("username: ");
@@ -224,7 +253,52 @@ public class LogIn extends JFrame{
 		password.setBounds(50, 45, 90, 22);
 		passwordText.setBounds(140, 45, 200, 22);
 		confirm.setBounds(50, 80, 90, 22);
-		confirmedPassword.setBounds(140, 80, 200, 22);	
+		confirmedPassword.setBounds(140, 80, 200, 22);
+		confirmedPassword.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == (KeyEvent.VK_ENTER)) {
+					String password, username, confirmed;
+					password = passwordText.getText();
+					username = userText.getText();
+					confirmed = confirmedPassword.getText();
+					if(password.equals(confirmed)) {
+						//if(validatePasswordComplexity(password)) {
+						if(createAccount(username, password)) {
+							cardLayout.show(mainPanel, "login");
+							getRootPane().setDefaultButton(go);
+							revalidate();
+						}
+/*					}
+					else {
+						JOptionPane.showMessageDialog(null, "password doesn't meet password complexity");
+						userText.setText("");
+						passwordText.setText("");
+						confirmedPassword.setText("");
+					}*/
+					}
+					else {
+						JOptionPane.showMessageDialog(createAcc, "Passwords are not the same. Please try again.");
+						userText.setText("");
+						passwordText.setText("");
+						confirmedPassword.setText("");
+					}
+
+				}
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+		});
 		
 		back.addActionListener(new ActionListener() {
 			
@@ -278,7 +352,6 @@ public class LogIn extends JFrame{
 		mainPanel.add(panel, "createAccount");
 	}
 
-	@SuppressWarnings("deprecation")
 	private void resetPassword() {
 		JPanel passwordReset = new JPanel();
 		passwordReset.setLayout(null);
@@ -290,10 +363,8 @@ public class LogIn extends JFrame{
 		passwordReset.add(username);
 		passwordReset.add(userText);
 		
-		
-		
 		JButton back = new JButton("back");
-		back.setBounds(50, 100, 50, 20);
+		back.setBounds(50, 100, 80, 30);
 		back.addActionListener(new ActionListener() {
 			
 			@Override 
@@ -305,11 +376,10 @@ public class LogIn extends JFrame{
 		});
 		passwordReset.add(back);
 		
-		reset.setBounds(227, 100, 50, 20);
+		reset.setBounds(227, 100, 80, 30);
 		passwordReset.add(reset);
-		getRootPane().setDefaultButton(reset);
 		JButton update = new JButton("update");
-		update.setBounds(227, 100, 50, 20);
+		update.setBounds(227, 100, 80, 30);
 		
 		passwordReset.add(update);
 		
@@ -326,46 +396,83 @@ public class LogIn extends JFrame{
 		confirmPassword.setBounds(50, 60, 150, 20);
 		passwordText.setBounds(160, 25, 150, 20);
 		confirm.setBounds(160, 60, 150, 20);
-		
-		reset.addActionListener(new ActionListener() {
-			
+
+		confirm.addKeyListener(new KeyListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name = userText.getText();
-				if(doesUsernameExist(name)) {
-					//System.out.println("hello");
-					username.setVisible(false);
-					userText.setVisible(false);
-					
-					reset.setVisible(false);;
-					update.setVisible(true);
-					getRootPane().setDefaultButton(update);
-					
-					passwordLabel.setVisible(true);
-					confirmPassword.setVisible(true);
-					passwordText.setVisible(true);
-					confirm.setVisible(true);
-					
-					/*
-					 * JLabel passwordComp = new
-					 * JLabel("minimum 8 characters, 1 uppercase, lowercase, numeric value, and symbol"
-					 * ); String font = String.valueOf(passwordComp.getFont());
-					 * passwordComp.setFont(new Font(font, Font.BOLD, 12));;
-					 * passwordComp.setBounds(20, 90, 425, 30); passwordComp.setVisible(true);
-					 * passwordReset.add(passwordComp);
-					 */
-						
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String password, username, confirmed;
+					password = passwordText.getText();
+					username = userText.getText();
+					confirmed = confirm.getText();
+
+					if(password.equals(confirmed)) {
+						//if(validatePasswordComplexity(password)) {
+						updatePassword(username, password);
+						JOptionPane.showMessageDialog(passwordReset, "your password was successfully updated");
+						cardLayout.show(mainPanel, "login");
+						getRootPane().setDefaultButton(go);
+						revalidate();
+					}
+					else {
+						JOptionPane.showMessageDialog(passwordReset, "password does not meet password requirements");
+						passwordText.setText("");
+						confirm.setText("");
+					}
+				}
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+		});
+
+		userText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String name = userText.getText();
+					if(doesUsernameExist(name)) {
+						//System.out.println("hello");
+						username.setVisible(false);
+						userText.setVisible(false);
+
+						reset.setVisible(false);;
+						update.setVisible(true);
+
+						passwordLabel.setVisible(true);
+						confirmPassword.setVisible(true);
+						passwordText.setVisible(true);
+						confirm.setVisible(true);
+						passwordReset.revalidate();
+					}
+					else {
+						userText.setText("");
+						passwordText.setText("");
+						confirm.setText("");
+					}
 					passwordReset.revalidate();
 				}
-				else {
-					userText.setText("");
-					passwordText.setText("");
-					confirm.setText("");
-				}
-				passwordReset.revalidate();
 			}
-		});		
-		
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+		});
+
 		update.addActionListener(new ActionListener() {
 			
 			@Override
@@ -380,7 +487,6 @@ public class LogIn extends JFrame{
 						updatePassword(username, password);
 						JOptionPane.showMessageDialog(passwordReset, "your password was successfully updated");
 						cardLayout.show(mainPanel, "login");
-						getRootPane().setDefaultButton(go);
 						revalidate();
 					}
 					else {
@@ -390,6 +496,44 @@ public class LogIn extends JFrame{
 					}
 				}
 			//}
+		});
+
+		reset.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = userText.getText();
+				if(doesUsernameExist(name)) {
+					//System.out.println("hello");
+					username.setVisible(false);
+					userText.setVisible(false);
+
+					reset.setVisible(false);;
+					update.setVisible(true);
+
+					passwordLabel.setVisible(true);
+					confirmPassword.setVisible(true);
+					passwordText.setVisible(true);
+					confirm.setVisible(true);
+
+					/*
+					 * JLabel passwordComp = new
+					 * JLabel("minimum 8 characters, 1 uppercase, lowercase, numeric value, and symbol"
+					 * ); String font = String.valueOf(passwordComp.getFont());
+					 * passwordComp.setFont(new Font(font, Font.BOLD, 12));;
+					 * passwordComp.setBounds(20, 90, 425, 30); passwordComp.setVisible(true);
+					 * passwordReset.add(passwordComp);
+					 */
+
+					passwordReset.revalidate();
+				}
+				else {
+					userText.setText("");
+					passwordText.setText("");
+					confirm.setText("");
+				}
+				passwordReset.revalidate();
+			}
 		});
 		passwordReset.add(confirmPassword);
 		passwordReset.add(passwordLabel);
@@ -430,17 +574,14 @@ public class LogIn extends JFrame{
 				if(nextID == null) {
 					id = docID;
 					isValid = false;
-					System.out.println(id);
 					break;
 				}
 				else {
 					nextID.clear();
 					getID.clear();
-					System.out.println(docID);
 					docID++;
 					getID.append("_id", docID);
 					nextID = collection.find(getID).first();
-					System.out.println(nextID);
 					
 				}
 			}while(isValid);
@@ -526,17 +667,7 @@ public class LogIn extends JFrame{
 	
 	public static void main(String[] args) {
 
-		try {
-			setLookAndFeel(getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
+
 		LogIn menu = new LogIn();
 		menu.setVisible(true);
 	}
